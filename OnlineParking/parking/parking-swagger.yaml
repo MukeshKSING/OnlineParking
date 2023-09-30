@@ -1,0 +1,245 @@
+swagger: "2.0"
+info:
+  description: "Swagger of the Parking Spring Boot example"
+  version: "1.0.0"
+  title: "Parking Spring Boot Example"
+host: "localhost:8080"
+basePath: "/"
+tags:
+- name: "parking"
+  description: "Parking management"
+  externalDocs:
+    description: "Find out more"
+    url: "https://github.com/averbo/parking"
+schemes:
+- "http"
+paths:
+  /parking:
+    post:
+      tags:
+      - "parking"
+      summary: "Create parking"
+      description: "Create a parking with the corresponding parkingData"
+      operationId: "createParking"
+      produces:
+      - "application/json"
+      parameters:
+      - name: parkingData
+        in: body
+        description: "Data of the parking"
+        required: true
+        schema:
+            $ref: '#/definitions/ParkingData'
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "object"
+            items:
+              $ref: "#/definitions/Parking"
+        400:
+          description: "Invalid status value"
+      security:
+      - parking_auth: []
+  /parking/{parkingId}:
+    get:
+      tags:
+      - "parking"
+      summary: "Get available bays"
+      description: "Get number of available bays of the parking"
+      operationId: "getAvailableBays"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "parkingId"
+        in: "path"
+        description: "Id of the parking"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "integer"
+        400:
+          description: "Invalid status value"
+      security:
+      - parking_auth: []
+  /parking/{parkingId}/park/{carType}:
+    put:
+      tags:
+      - "parking"
+      summary: "Park a car"
+      description: "Parks a car of the given type in the parking"
+      operationId: "parkCar"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "parkingId"
+        in: "path"
+        description: "Id of the parking"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "carType"
+        in: "path"
+        description: "Type of the car to park"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "string"
+        405:
+          description: "Invalid input"
+      security:
+      - parking_auth: []
+ 
+  /parking/{parkingId}/unpark/{index}:
+    put:
+      tags:
+      - "parking"
+      summary: "Unparks a car"
+      description: "Unparks teh car parked on the given index"
+      operationId: "unparkCar"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "parkingId"
+        in: "path"
+        description: "Id of the parking"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "index"
+        in: "path"
+        description: "Car index to unpark"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+         200:
+          description: "successful operation"
+          schema:
+            type: "boolean"
+      security:
+      - parking_auth: []
+  /parking/{parkingId}/print:
+    get:
+      tags:
+      - "parking"
+      summary: "Prints park representation"
+      description: "Prints the parking representation"
+      operationId: "printParking"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "parkingId"
+        in: "path"
+        description: "Id of the parking"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "string"
+        400:
+          description: "Invalid tag value"
+      security:
+      - parking_auth: []
+securityDefinitions:
+  parking_auth: 
+    type: "basic"
+definitions:
+  Parking:
+    title: Parking
+    example:
+      id: 1
+      size: 5
+      bays: [5, 10]
+    type: object
+    properties:
+      id:
+        description: 'Id of the parking'
+        type: integer
+      size:
+        description: 'Square size of the parking'
+        type: integer
+      bays:
+        description: 'Bays of the parking'
+        type: array
+        items:
+          $ref: "#/definitions/ParkingBay"
+    required:
+      - size
+  ParkingBay:
+    title: ParkingBay
+    example:
+      bayId: 112
+      index: 2
+      disabled: false
+      pedestrianExit: false
+      distanceToExit: 3
+      parkedCar: U
+      available: true
+    type: object
+    properties:
+      bayId:
+        description: 'Id of the bay'
+        type: integer
+      index:
+        description: 'Index of the bay'
+        type: integer
+      disabled:
+        description: 'disabled-only bay indicator'
+        type: boolean
+      pedestrianExit:
+        description: 'Pedestrian exit indicator'
+        type: boolean
+      distanceToExit:
+        description: 'Distnace to nearest pedestrian exit'
+        type: integer
+      parkedCar:
+        description: 'Description of the bay'
+        type: string
+      available:
+        description: 'Availability indicator'
+        type: boolean
+    required:
+      - bayId
+      - index
+      - disabled
+      - pedestrianExit
+      - distanceToExit
+      - parkedCar
+      - available
+  ParkingData:
+    title: ParkingData
+    example:
+      size: 5
+      pedestrianExits: [8, 12]
+      disabledBays: [5, 10]
+    type: object
+    properties:
+      size:
+        description: 'Square size of the parking'
+        type: integer
+      pedestrianExits:
+        description: 'Index of the pedestrian exits'
+        type: array
+        items:
+          type: integer
+      disabledBays:
+        description: 'Index of the disabled bays'
+        type: array
+        items:
+          type: integer
+    required:
+      - size
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
